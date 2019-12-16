@@ -1,5 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="@android:style/Theme.Holo.Light">
-	</style>
+	<!-- Default theme of app. -->
+    <style name="BaseTheme" parent="@android:style/Theme.Holo">
+        <item name="android:actionBarStyle">@style/BaseTheme.ActionBarStyle</item>
+
+		<!-- Style different views -->
+		<item name="android:textViewStyle">@style/BaseTheme.TextView</item>
+		<item name="android:buttonStyle">@style/BaseTheme.Button</item>
+		<item name="android:editTextStyle">@style/BaseTheme.EditText</item>
+    </style>
+
+    <!-- Styles all TextViews -->
+    <style name="BaseTheme.TextView" parent="@android:style/Widget.Holo.TextView">
+		<item name="android:textAppearance">@style/BaseTheme.TextAppearance</item>
+    </style>
+
+    <!-- Styles all Buttons -->
+    <style name="BaseTheme.Button" parent="@android:style/Widget.Holo.Button">
+		<item name="android:textAppearance">@style/BaseTheme.TextAppearance</item>
+    </style>
+
+    <!-- Styles all EditTexts -->
+    <style name="BaseTheme.EditText" parent="@android:style/Widget.Holo.EditText">
+		<item name="android:textAppearance">@style/BaseTheme.TextAppearance</item>
+    </style>
+
+    <!-- Style TextAppearance of Views from this Style. -->
+    <style name="BaseTheme.TextAppearance" parent="@android:style/TextAppearance.Holo">
+		<!-- TODO: Know how to change whole app's font at once because changing font from is not
+		an easy task, you have style then all view like ActionBar, BarButton, ActionButton,
+		etc. -->
+		<item name="android:fontFamily">sans</item>
+    </style>
+
+    <!-- Style ActionBar -->
+    <style name="BaseTheme.ActionBarStyle" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@color/primaryColor</item>
+    </style>
+
+	<!-- Use this Style to change an Activity to Dialog. -->
+    <style name="BaseTheme.DialogActivity" parent="@android:style/Theme.Holo.Dialog">
+    </style>
+
+	<!-- Use this Style if you want to hide ActionBar and app label -->
+    <style name="BaseTheme.NoActionBar" parent="BaseTheme">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 </resources>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory
+		android:title="@string/app_settings">
+		<SwitchPreference
+			android:key="show_notification"
+			android:title="@string/show_notification"
+			android:defaultValue="true"
+			android:summary="@string/summary_show_notification" />
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="@string/filter_settings">
+		<CheckBoxPreference
+			android:key="filter_status_bar"
+			android:title="@string/filter_status_bar"
+			android:defaultValue="true"
+			android:summary="@string/summary_filter_status_bar"/>
+		<ListPreference
+			android:key="filter_color"
+			android:title="@string/filter_color"
+            android:summary="@string/summary_filter_color"
+			android:dialogTitle="@string/filter_color"/>
+	</PreferenceCategory>
+
+    <PreferenceCategory
+		android:title="@string/share">
+		<PreferenceScreen
+			android:key="share_app"
+			android:title="@string/share"
+			android:summary="@string/summary_share">
+			<intent	android:action="android.intent.action.VIEW"
+				android:data="http://www.android.com" />
+		</PreferenceScreen>
+        <PreferenceScreen
+			android:title="@string/rate_us"
+			android:summary="@string/summary_rate_us">
+			<intent android:action="android.intent.action.VIEW"
+				android:data="http://www.android.com" />
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="@string/support">
+		<PreferenceScreen
+			android:title="@string/need_help"
+			android:summary="@string/summary_need_help">
+            <intent android:action="android.intent.action.VIEW"
+				android:data="http://www.android.com" />
+        </PreferenceScreen>
+		<PreferenceScreen
+			android:title="@string/suggest_a_feature"
+			android:summary="@string/summary_suggest_a_feature">
+            <intent android:action="android.intent.action.VIEW"
+				android:data="http://www.android.com" />
+        </PreferenceScreen>
+		<PreferenceScreen
+			android:title="@string/feedback"
+			android:summary="@string/summary_feedback">
+            <intent android:action="android.intent.action.VIEW"
+				android:data="http://www.android.com" />
+        </PreferenceScreen>
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="@string/about">
+		<Preference
+			android:title="@string/about"
+			android:summary="@string/summary_about"
+			android:key="about_app">
+        </Preference>
+	</PreferenceCategory>
+</PreferenceScreen>
