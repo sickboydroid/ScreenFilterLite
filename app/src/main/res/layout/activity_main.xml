@@ -9,39 +9,38 @@
 	android:paddingRight="10dp"
 	android:paddingTop="5dp">
 	<TextView
-		android:layout_width="wrap_content"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginBottom="5dp"
-		android:layout_marginTop="5dp"
-		android:text="@string/screen_filter_desc"
-		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:textColor="@color/lightGray"/>
-	
+		android:layout_margin="7dp"
+		android:gravity="center_horizontal"
+		android:text="@string/screen_filter_app_desc"
+		android:textAppearance="?android:attr/textAppearanceLarge"/>
+
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="5dp"
 		android:text="@string/filter_opacity"
 		android:textAppearance="?android:attr/textAppearanceMedium"/>
-	
+
 	<SeekBar
 		android:id="@+id/filter_opacity"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"/>
-	
+
 	<TextView
+		android:id="@+id/filter_opacity_percent"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="right"
-		android:text="20%"
 		android:textAppearance="?android:attr/textAppearanceMedium"/>
-	
+
 	<ToggleButton
 		android:id="@+id/toggle_filter"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center_horizontal"/>
-	
+
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -49,5 +48,5 @@
 		android:layout_marginTop="20dp"
 		android:gravity="center"
 		android:text="@string/developer_info"
-		android:textAppearance="?android:attr/textAppearanceLarge"/>
+		android:textAppearance="?android:attr/textAppearanceMedium"/>
 </LinearLayout>

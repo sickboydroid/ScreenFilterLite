@@ -9,34 +9,7 @@
         <item name="android:colorAccent">@color/accentColor</item>
         <item name="android:statusBarColor">@color/primaryDarkColor</item>
         <item name="android:colorButtonNormal">@color/accentColor</item>
-
-		<!-- Style different views -->
-		<item name="android:textViewStyle">@style/BaseTheme.TextView</item>
-		<item name="android:buttonStyle">@style/BaseTheme.Button</item>
-		<item name="android:editTextStyle">@style/BaseTheme.EditText</item>
-    </style>
-
-    <!-- Styles all TextViews -->
-    <style name="BaseTheme.TextView" parent="@android:style/Widget.Material.TextView">
-		<item name="android:textAppearance">@style/BaseTheme.TextAppearance</item>
-    </style>
-
-    <!-- Styles all Buttons -->
-    <style name="BaseTheme.Button" parent="@android:style/Widget.Material.Button">
-    	<item name="android:textAppearance">@style/BaseTheme.TextAppearance</item>
-    </style>
-
-    <!-- Styles all EditTexts -->
-    <style name="BaseTheme.EditText" parent="@android:style/Widget.Material.EditText">
-    	<item name="android:textAppearance">@style/BaseTheme.TextAppearance</item>
-    </style>
-
-    <!-- Style TextAppearance of Views from this Style. -->
-    <style name="BaseTheme.TextAppearance" parent="@android:style/TextAppearance.Material">
-		<!-- TODO: Know how to change whole app's font at once because changing font from is not
-		an easy task, you have style then all view like ActionBar, BarButton, ActionButton,
-		etc. -->
-		<item name="android:fontFamily">sans</item>
+		<item name="android:typeface">sans</item>
     </style>
 
     <!-- Use this Style to change an Activity to Dialog. -->
