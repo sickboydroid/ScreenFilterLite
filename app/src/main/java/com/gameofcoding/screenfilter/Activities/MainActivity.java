@@ -101,10 +101,10 @@ public class MainActivity extends BaseActivity {
 		}
 		/*==========================================*/
 		setContentView(R.layout.activity_main);
-		mSeekBarFilterOpacity = findViewById(R.id.filter_opacity);
 		final TextView tvFilterOpacityPercent = findViewById(R.id.filter_opacity_percent);
 		mSharedPrefsScreenFilter = getSharedPreferences(ScreenFilterService.KEY_SHARED_PREF_SCREEN_FILTER, MODE_PRIVATE);
 		mToggleBtnFilter = findViewById(R.id.toggle_filter);
+		mSeekBarFilterOpacity = findViewById(R.id.filter_opacity);
 		mSeekBarFilterOpacity.setMax(225);
 		mSeekBarFilterOpacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 				@Override
