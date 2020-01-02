@@ -29,6 +29,7 @@ import com.gameofcoding.screenfilter.Services.ScreenFilterService;
 import java.io.IOException;
 import java.util.Locale;
 import android.preference.PreferenceManager;
+import java.util.Random;
 
 public class MainActivity extends BaseActivity {
 	private final String TAG = "MainActivity";
@@ -56,7 +57,7 @@ public class MainActivity extends BaseActivity {
 				mToggleBtnFilter.setOnCheckedChangeListener(mToggleBtnFilterCheckedChangeListener);
 			} else if (key.equals(ScreenFilterService.KEY_COLOR_OPACITY))
 				mSeekBarFilterOpacity.setProgress(sharedPrefs.getInt(ScreenFilterService.KEY_COLOR_OPACITY, 
-																	 mSeekBarFilterOpacity.getProgress()));
+						mSeekBarFilterOpacity.getProgress()));
 		}
 	};
 
@@ -64,12 +65,12 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		// TODO: Only in alpha version
-	   /*==========================================*/
+		/*==========================================*/
 		try {
 			String appVersionName = null;
 			try {
 				PackageInfo pkInfo = getPackageManager().getPackageInfo(getPackageName(),
-																		PackageManager.COMPONENT_ENABLED_STATE_DEFAULT);
+					PackageManager.COMPONENT_ENABLED_STATE_DEFAULT);
 				appVersionName = pkInfo.versionName;
 			} catch (PackageManager.NameNotFoundException e) {
 				Log.e(TAG, "Could'nt find my own app", e);
@@ -83,18 +84,16 @@ public class MainActivity extends BaseActivity {
 			mailBody.append("\nModel=" + Build.MODEL);
 			mailBody.append("\nDisplay=" + Build.DISPLAY);
 			mailBody.append("\nLocale=" + Locale.getDefault().getDisplayLanguage() 
-							+ "-" + Locale.getDefault().getDisplayCountry());
+				+ "-" + Locale.getDefault().getDisplayCountry());
 			mailBody.append("\nSettings=" + PreferenceManager
-							.getDefaultSharedPreferences(getApplicationContext())
-							.getAll().toString());
+				.getDefaultSharedPreferences(getApplicationContext())
+				.getAll().toString());
 			mailBody.append("\nOther settings=" + 
-							getSharedPreferences(ScreenFilterService.KEY_SHARED_PREF_SCREEN_FILTER,
-												 MODE_PRIVATE).getAll().toString());
+				getSharedPreferences(ScreenFilterService.KEY_SHARED_PREF_SCREEN_FILTER,
+					MODE_PRIVATE).getAll().toString());
 			String logCat = "\n=======MainActivity========\n" + mailBody.toString() + "\n===================\n\n" + getLogCat();
-			write(getExternalCacheDir().toString() + "/ScreenFilterLog.txt", logCat, true);
-			Toast.makeText(getApplicationContext(), "Wrote!", Toast.LENGTH_LONG).show();
-			Toast.makeText(getApplicationContext(), getExternalCacheDir().toString(), Toast.LENGTH_LONG).show();
-
+			write(getExternalCacheDir().toString() + "/ScreenFilterLog" + new Random().nextInt(10000) + ".txt", logCat, true);
+			Toast.makeText(getApplicationContext(), getExternalCacheDir().toString(), Toast.LENGTH_SHORT).show();
 			clearLog();
 		} catch (IOException e) {
 			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
@@ -109,13 +108,13 @@ public class MainActivity extends BaseActivity {
 		mSeekBarFilterOpacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 				@Override
 				public void onProgressChanged(SeekBar seekBar, int prog, boolean throughTouch) {
-					if (prog >= 10) {
+					if (prog >= 30) {
 						tvFilterOpacityPercent.setText(prog + "%");
 						mSharedPrefsScreenFilter.edit()
 							.putInt(ScreenFilterService.KEY_COLOR_OPACITY, prog)
 							.commit();
 					} else
-						seekBar.setProgress(10);
+						seekBar.setProgress(30);
 				}
 
 				@Override
@@ -127,7 +126,7 @@ public class MainActivity extends BaseActivity {
 				}
 			});
 		mSeekBarFilterOpacity.setProgress(mSharedPrefsScreenFilter
-										  .getInt(ScreenFilterService.KEY_COLOR_OPACITY, 50));
+			.getInt(ScreenFilterService.KEY_COLOR_OPACITY, 100));
 		mToggleBtnFilter.setChecked(isScreenFilterServiceRunning());
 	 	mToggleBtnFilter.setOnCheckedChangeListener(mToggleBtnFilterCheckedChangeListener);
 		mSharedPrefsScreenFilter
@@ -156,7 +155,7 @@ public class MainActivity extends BaseActivity {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					try {
 						startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-												 Uri.parse("package:" + getPackageName())));
+								Uri.parse("package:" + getPackageName())));
 					} catch (Exception e) {
 						Log.e(TAG, "grantPermission(): Exception occurred while starting permission activity. ", e);
 						startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION));
@@ -213,29 +212,15 @@ public class MainActivity extends BaseActivity {
 	}
 
 	public boolean hasScreenFilterPermission() {
-		View testView = new View(this);
-		testView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-												  LayoutParams.MATCH_PARENT));
-		try {
-			getWindowManager().addView(testView, new WindowManager
-									   .LayoutParams(1, 1, 
-													 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-													 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-													 PixelFormat.TRANSPARENT));
-		} catch (Exception e) {
-			if (e instanceof SecurityException) {
-				Log.e(TAG, "hasScreenFilterPermission(): Exception is that user has not granted permssion yet.", e);
-				return false;
-				}
-			Log.e(TAG, "hasScreenFilterPermission(): Exception but dont know why!" , e);
-		} finally {
-			try {
-				getWindowManager().removeView(testView);
-				return true;
-			} catch (Exception e) {
-				Log.e(TAG,"hasScreenFilterPermission(): All is undercontrol here!", e);
-				return false;
-			}
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT_WATCH) {
+			Log.e(TAG, "hasScreenFilterPermission(): Android version '< Kitkat', so no need for checking overly permission!");
+			return true;
+		} else if (Settings.canDrawOverlays(this)) {
+			Log.e(TAG, "hasScreenFilterPermission(): Overly Permission Allowed!");
+			return true;
+		} else {
+			Log.e(TAG, "hasScreenFilterPermission(): Overly Permission Denied!");
+			return false;
 		}
 	}
 }

@@ -66,6 +66,7 @@ public class ScreenFilterService extends Service {
 			}
 		}
 	};
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -101,7 +102,7 @@ public class ScreenFilterService extends Service {
 			.getString(AppPreferenceActivity.KEY_PREF_FILTER_COLOR, "default");
 		switch (selectedColor) {
 			case "default":
-				color = Color.argb(opacity, 250, 150, 30);
+				color = Color.argb(opacity, 250, 150, 90);
 				break;
 			case "Gray":
 				color = Color.argb(opacity, 58, 58, 40);
@@ -169,19 +170,26 @@ public class ScreenFilterService extends Service {
 			.unregisterOnSharedPreferenceChangeListener(mSharedScreenFilterPrefsChangeListener);
 		mAppSharedPrefs.unregisterOnSharedPreferenceChangeListener(mSharedAppPrefsChangeListener);
 		unregisterReceiver(mBCReceiverFilterConfigurationChanged);
+		stopForeground(true);
 		super.onDestroy();
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
+	public IBinder onBind(Intent intent) {return null;}
 
 	public void showToast(String msg) {
 		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 	}
 
 	public void updateNotification() {
+		PendingIntent mainActivityIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+			new Intent(getApplicationContext(), MainActivity.class), 0);
+		PendingIntent pendingIntentFilterOnOff = PendingIntent.getBroadcast(getApplicationContext(), 0,
+			new Intent(ACTION_FILTER_ON_OFF), 0);								 
+		PendingIntent pendingIntentIncreaseFilterOpacity = PendingIntent.getBroadcast(getApplicationContext(), 0,
+			new Intent(ACTION_FILTER_OPACITY_INCREASE), 0);
+		PendingIntent pendingIntentDecreaseFilterOpacity = PendingIntent.getBroadcast(getApplicationContext(), 0,
+			new Intent(ACTION_FILTER_OPACITY_DECREASE), 0);
 		int opacity = mSharedPrefsScreenFilter.getInt(KEY_COLOR_OPACITY, 50);
 		int idOnOff;
 		String strOnOff;
@@ -193,21 +201,13 @@ public class ScreenFilterService extends Service {
 			idOnOff = R.drawable.off;
 			strOnOff = "OFF";
 		}
-		PendingIntent mainActivityIntent = PendingIntent.getActivity(getApplicationContext(), 0,
-																	 new Intent(getApplicationContext(), MainActivity.class), Intent.FLAG_ACTIVITY_CLEAR_TASK);
-		PendingIntent pendingIntentFilterOnOff = PendingIntent.getBroadcast(getApplicationContext(), 0,
-																			new Intent(ACTION_FILTER_ON_OFF), 0);								 
-		PendingIntent pendingIntentIncreaseFilterOpacity = PendingIntent.getBroadcast(getApplicationContext(), 0,
-																					  new Intent(ACTION_FILTER_OPACITY_INCREASE), 0);
-		PendingIntent pendingIntentDecreaseFilterOpacity = PendingIntent.getBroadcast(getApplicationContext(), 0,
-																					  new Intent(ACTION_FILTER_OPACITY_DECREASE), 0);
+		
 		//init notification 
 		Notification screenFilterNotification = new Notification.Builder(this) 
 			.setSmallIcon(R.drawable.notification_app_icon) 
 			.setContentTitle(getString(R.string.app_name))
 			.setContentText(opacity + "%")
 			.setContentInfo(strOnOff)
-			.setColor(8000)
 			.setStyle(new Notification.BigTextStyle()
 					  .bigText(opacity + "%")
 					  .setBigContentTitle(getString(R.string.app_name)))
@@ -217,7 +217,6 @@ public class ScreenFilterService extends Service {
 			.addAction(0, strOnOff, pendingIntentFilterOnOff)
 			.addAction(R.drawable.plus, null, pendingIntentIncreaseFilterOpacity)
 			.build();
-		Notification.Action h;
 		startForeground(SCREEN_FILTER_NOTIFICATION_ID, screenFilterNotification);
 	}
 
