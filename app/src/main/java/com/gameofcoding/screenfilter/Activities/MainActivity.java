@@ -7,17 +7,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.PixelFormat;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup.LayoutParams;
-import android.view.WindowManager;
+import android.view.Window;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -28,8 +27,10 @@ import com.gameofcoding.screenfilter.R;
 import com.gameofcoding.screenfilter.Services.ScreenFilterService;
 import java.io.IOException;
 import java.util.Locale;
-import android.preference.PreferenceManager;
 import java.util.Random;
+import android.app.Service;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.app.IntentService;
 
 public class MainActivity extends BaseActivity {
 	private final String TAG = "MainActivity";
@@ -64,41 +65,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-		// TODO: Only in alpha version
-		/*==========================================*/
-		try {
-			String appVersionName = null;
-			try {
-				PackageInfo pkInfo = getPackageManager().getPackageInfo(getPackageName(),
-					PackageManager.COMPONENT_ENABLED_STATE_DEFAULT);
-				appVersionName = pkInfo.versionName;
-			} catch (PackageManager.NameNotFoundException e) {
-				Log.e(TAG, "Could'nt find my own app", e);
-				appVersionName = "unknown";
-			}
-			StringBuilder mailBody = new StringBuilder();
-			mailBody.append("Android Version=" + Build.VERSION.RELEASE);
-			mailBody.append("\nApp Version=" + appVersionName);
-			mailBody.append("\nBrand=" + Build.BRAND);
-			mailBody.append("\nDevice=(" + Build.DEVICE + ")");
-			mailBody.append("\nModel=" + Build.MODEL);
-			mailBody.append("\nDisplay=" + Build.DISPLAY);
-			mailBody.append("\nLocale=" + Locale.getDefault().getDisplayLanguage() 
-				+ "-" + Locale.getDefault().getDisplayCountry());
-			mailBody.append("\nSettings=" + PreferenceManager
-				.getDefaultSharedPreferences(getApplicationContext())
-				.getAll().toString());
-			mailBody.append("\nOther settings=" + 
-				getSharedPreferences(ScreenFilterService.KEY_SHARED_PREF_SCREEN_FILTER,
-					MODE_PRIVATE).getAll().toString());
-			String logCat = "\n=======MainActivity========\n" + mailBody.toString() + "\n===================\n\n" + getLogCat();
-			write(getExternalCacheDir().toString() + "/ScreenFilterLog" + new Random().nextInt(10000) + ".txt", logCat, true);
-			Toast.makeText(getApplicationContext(), getExternalCacheDir().toString(), Toast.LENGTH_SHORT).show();
-			clearLog();
-		} catch (IOException e) {
-			Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
-		}
-		/*==========================================*/
 		setContentView(R.layout.activity_main);
 		final TextView tvFilterOpacityPercent = findViewById(R.id.filter_opacity_percent);
 		mSharedPrefsScreenFilter = getSharedPreferences(ScreenFilterService.KEY_SHARED_PREF_SCREEN_FILTER, MODE_PRIVATE);
@@ -126,15 +92,23 @@ public class MainActivity extends BaseActivity {
 				}
 			});
 		mSeekBarFilterOpacity.setProgress(mSharedPrefsScreenFilter
-			.getInt(ScreenFilterService.KEY_COLOR_OPACITY, 100));
+			.getInt(ScreenFilterService.KEY_COLOR_OPACITY, 80));
+		
+		// FIXME: Don't start filter here instead know how to know that is filter
+		// service runnung or not
+		startFilter(true);
 		mToggleBtnFilter.setChecked(isScreenFilterServiceRunning());
 	 	mToggleBtnFilter.setOnCheckedChangeListener(mToggleBtnFilterCheckedChangeListener);
 		mSharedPrefsScreenFilter
 			.registerOnSharedPreferenceChangeListener(mSharedScreenFilterPrefsChangeListener);
     }
-
+	
 	private boolean startFilter() {
-		if (!isScreenFilterServiceRunning()) {
+		return startFilter(false);
+	}
+	
+	private boolean startFilter(boolean forcebly) {
+		if (forcebly || (!isScreenFilterServiceRunning())) {
 			if (hasScreenFilterPermission()) {
 				startService(new Intent(MainActivity.this, ScreenFilterService.class));
 				return true;
@@ -148,16 +122,23 @@ public class MainActivity extends BaseActivity {
 
 	private void grantPermission() {
 		new AlertDialog.Builder(mContext)
-			.setTitle(R.string.permission_denied)
+			.setTitle(R.string.permission_request)
 			.setMessage(R.string.permission_request_desc)
 			.setPositiveButton(R.string.go_to_settings, new DialogInterface.OnClickListener(){
 				@Override
 				public void onClick(DialogInterface dialog, int whichButton) {
 					try {
-						startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-								Uri.parse("package:" + getPackageName())));
+						Intent overlayPermissionActivity =	new Intent(
+							Settings.ACTION_MANAGE_OVERLAY_PERMISSION, 
+							Uri.parse("package:" + getPackageName()));
+						startActivity(overlayPermissionActivity);
 					} catch (Exception e) {
-						Log.e(TAG, "grantPermission(): Exception occurred while starting permission activity. ", e);
+						StringBuilder logMessage = new StringBuilder();
+						logMessage.append("grantPermission():");
+						logMessage
+							.append(" Exception occurred while starting overlay permission activity.");
+						logMessage.append(" Getting permission in simple way!");
+						Log.e(TAG, logMessage.toString(), e);
 						startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION));
 						showToast(R.string.grant_permission_instruction, false);
 						showToast(R.string.grant_permission_instruction);
@@ -201,7 +182,7 @@ public class MainActivity extends BaseActivity {
 				finish();
 				return true;
 		}
-		return super.onOptionsItemSelected(item);
+		return false;
 	}
 
 	@Override
@@ -211,15 +192,15 @@ public class MainActivity extends BaseActivity {
 		super.onDestroy();
 	}
 
-	public boolean hasScreenFilterPermission() {
+	private boolean hasScreenFilterPermission() {
 		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT_WATCH) {
 			Log.e(TAG, "hasScreenFilterPermission(): Android version '< Kitkat', so no need for checking overly permission!");
 			return true;
 		} else if (Settings.canDrawOverlays(this)) {
-			Log.e(TAG, "hasScreenFilterPermission(): Overly Permission Allowed!");
+			Log.e(TAG, "Overly Permission Allowed!");
 			return true;
 		} else {
-			Log.e(TAG, "hasScreenFilterPermission(): Overly Permission Denied!");
+			Log.e(TAG, "Overly Permission Denied!");
 			return false;
 		}
 	}

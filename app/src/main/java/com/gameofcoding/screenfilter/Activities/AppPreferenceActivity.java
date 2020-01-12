@@ -81,12 +81,7 @@ public class AppPreferenceActivity extends PreferenceActivity {
 					if (prefs.getEditor().clear().commit()) {
 						Toast.makeText(getApplicationContext(), 
 							R.string.success_prefs_reset, Toast.LENGTH_LONG).show();
-						try {
-							startActivity(new Intent(getApplicationContext(),
-									AppPreferenceActivity.class));
-						} finally {
-							;finish();
-						}
+						recreate();
 					} else 
 						Toast.makeText(getApplicationContext(),
 							R.string.failure_prefs_reset, Toast.LENGTH_LONG).show();

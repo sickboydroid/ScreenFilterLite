@@ -42,9 +42,10 @@
 	<string name="developer">Developer : <i>Junaid Ashraf.</i></string>
 	<string name="chooser_title">Choose</string>
 	<string name="version">Version</string>
-	<string name="permission_denied">Permission Denied</string>
+	<string name="permission_request">Grant Permission</string>
 	<string name="permission_request_desc">This app needs \"<b>Draw Over Other Apps</b>\"
 		permission in order to work. Please grant permission in settings.</string>
 	<string name="go_to_settings">Go to Settings</string>
-	<string name="grant_permission_instruction">Select \"Screen Filter\" app and then grant permission.</string>
+	<string name="grant_permission_instruction">Select \"<b>Screen Filter</b>\" app <b>>></b>
+		Grant permission.</string>
 </resources>

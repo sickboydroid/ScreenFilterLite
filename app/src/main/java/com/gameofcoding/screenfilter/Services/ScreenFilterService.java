@@ -1,5 +1,7 @@
 package com.gameofcoding.screenfilter.Services;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -8,11 +10,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
@@ -37,7 +42,8 @@ public class ScreenFilterService extends Service {
 
 	BroadcastReceiver mBCReceiverFilterConfigurationChanged = new BCReceiverFilterConfigurationChanged();
 	WindowManager mWindowManager;
-    View mFilterView;
+    View mWindowFilterView;
+	View mNavFilterView;
 	SharedPreferences mAppSharedPrefs;
 	SharedPreferences mSharedPrefsScreenFilter;
 	private SharedPreferences.OnSharedPreferenceChangeListener mSharedScreenFilterPrefsChangeListener =
@@ -86,15 +92,28 @@ public class ScreenFilterService extends Service {
 		mAppSharedPrefs.registerOnSharedPreferenceChangeListener(mSharedAppPrefsChangeListener);
 		mFilterStatusBar = mAppSharedPrefs
 			.getBoolean(AppPreferenceActivity.KEY_PREF_FILTER_STATUS_BAR, true);
-		mFilterView = new View(this);
-		mFilterView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-													 LayoutParams.MATCH_PARENT));
+		mWindowFilterView = new View(this);
+		mNavFilterView = new View(this);
+		mWindowFilterView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+				@Override
+				public void onLayoutChange(View view, int left, int top, int right, int bottom, 
+					int oldLeft, int oldTop, int oldRight, int oldBottom) {
+					// FIXME: Is it right way of guesing new height?
+					int heightDifference = (top + bottom) - (oldTop + oldBottom);
+					if(heightDifference == -getNaviBarHeight())
+						// Navigation bar showing
+						startNaviBarFilter();
+					else if(heightDifference == getNaviBarHeight())
+						// Navigation bar hidden
+						stopNaviBarFilter();
+				}
+			});
 		updateFilterColor();
 		mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 	}
 
 	private void updateFilterColor() {
-		if (mFilterView == null)
+		if (mNavFilterView == null || mWindowFilterView == null)
 			return;
 		int color = -1;
 		int opacity = mSharedPrefsScreenFilter.getInt(KEY_COLOR_OPACITY, 10);
@@ -128,7 +147,8 @@ public class ScreenFilterService extends Service {
 			default:
 				color = Color.argb(opacity, 0, 0, 0);
 		}
-		mFilterView.setBackgroundColor(color);
+		mNavFilterView.setBackgroundColor(color);
+		mWindowFilterView.setBackgroundColor(color);
 	}
 
 	@Override
@@ -137,29 +157,85 @@ public class ScreenFilterService extends Service {
 		startFilter();
 		return START_STICKY;
 	}
+	
+	private boolean hasNavigationBar(){
+	
+		return false;
+	}
+
+	private int getNaviBarHeight() {
+		Resources resources = getResources();
+		int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+		if (resourceId > 0) {
+			return resources.getDimensionPixelSize(resourceId);
+		}
+		return 0;
+	}
 
 	public void startFilter() {
-		int filterFlags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-			| WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;	
-		if (mFilterStatusBar)
-			filterFlags = filterFlags | WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-		mWindowManager.addView(mFilterView, new WindowManager
-							   .LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 
-											 WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY, filterFlags,
-											 PixelFormat.TRANSLUCENT));
+		// Filter NavigationBar
+		startNaviBarFilter();
+
+		// Filter rest of the window
+		startWindowFilter();
+		
 		mSharedPrefsScreenFilter.edit()
 			.putBoolean(ScreenFilterService.KEY_SERVICE_RUNNING, true)
 			.commit();
 	}
+	
+	public void startNaviBarFilter() {
+		if(mNavFilterView.getParent() != null)
+			return;
+		int navHeight = getNaviBarHeight();
+		WindowManager.LayoutParams lPNavFilter = new WindowManager
+			.LayoutParams(LayoutParams.MATCH_PARENT, navHeight,
+			WindowManager.LayoutParams.TYPE_TOAST, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+			| WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
+			PixelFormat.TRANSLUCENT);
+		lPNavFilter.gravity = Gravity.BOTTOM;
+		mWindowManager.addView(mNavFilterView, lPNavFilter);
+	}
+	
+	public void stopNaviBarFilter(){
+		if(mNavFilterView.getParent() == null)
+			return;
+		mWindowManager.removeView(mNavFilterView);
+	}
+	
+	public void startWindowFilter(){
+		if(mWindowFilterView.getParent() != null)
+			return;
+		int flagsWindowFilter = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+			| WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+			| WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+		if (mFilterStatusBar)
+			flagsWindowFilter |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+		try {
+			WindowManager.LayoutParams lpWindowFilter =
+				new WindowManager.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT,
+				WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY, flagsWindowFilter, PixelFormat.TRANSLUCENT);
+			mWindowManager.addView(mWindowFilterView, lpWindowFilter);
+		} catch (Exception|Error e) {
+			showToast(e.toString());
+		}
+	}
+	
+	public void stopWindowFilter(){
+		if(mWindowFilterView.getParent() == null)
+			return;
+		mWindowManager.removeView(mWindowFilterView);
+	}
 
 	public void stopFilter() {
 		try {
-			mWindowManager.removeView(mFilterView);
+			stopNaviBarFilter();
+			stopWindowFilter();
 			mSharedPrefsScreenFilter.edit()
 				.putBoolean(ScreenFilterService.KEY_SERVICE_RUNNING, false)
 				.commit();
 		} catch (Exception e) {
-			Log.e(TAG, "stopFilter(): Exception occured, dont know why", e);
+			Log.e(TAG, "stopFilter(): Exception occured, don't know why", e);
 		}
 	}
 
@@ -201,7 +277,7 @@ public class ScreenFilterService extends Service {
 			idOnOff = R.drawable.off;
 			strOnOff = "OFF";
 		}
-		
+
 		//init notification 
 		Notification screenFilterNotification = new Notification.Builder(this) 
 			.setSmallIcon(R.drawable.notification_app_icon) 
@@ -209,8 +285,8 @@ public class ScreenFilterService extends Service {
 			.setContentText(opacity + "%")
 			.setContentInfo(strOnOff)
 			.setStyle(new Notification.BigTextStyle()
-					  .bigText(opacity + "%")
-					  .setBigContentTitle(getString(R.string.app_name)))
+			.bigText(opacity + "%")
+			.setBigContentTitle(getString(R.string.app_name)))
 			.setPriority(Notification.PRIORITY_HIGH)
 			.setContentIntent(mainActivityIntent)
 			.addAction(R.drawable.minus, null, pendingIntentDecreaseFilterOpacity)
