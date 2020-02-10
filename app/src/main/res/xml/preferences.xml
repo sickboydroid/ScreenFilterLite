@@ -17,7 +17,7 @@
 			android:title="@string/filter_color"
             android:summary="@string/summary_filter_color"
 			android:dialogTitle="@string/filter_color"
-			android:defaultValue="default"
+			android:defaultValue="filter_color_default"
 			android:entries="@array/pref_filter_color_entries"
 			android:entryValues="@array/pref_filter_color_entry_values"/>
 	</PreferenceCategory>

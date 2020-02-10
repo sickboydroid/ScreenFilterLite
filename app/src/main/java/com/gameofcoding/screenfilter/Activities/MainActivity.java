@@ -1,64 +1,68 @@
 package com.gameofcoding.screenfilter.Activities;
 
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 import com.gameofcoding.screenfilter.ModifiedClasses.BaseActivity;
 import com.gameofcoding.screenfilter.R;
 import com.gameofcoding.screenfilter.Services.ScreenFilterService;
-import java.io.IOException;
-import java.util.Locale;
-import java.util.Random;
-import android.app.Service;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.app.IntentService;
+import com.gameofcoding.screenfilter.Utils.AppConstants;
+import com.gameofcoding.screenfilter.Utils.FilterUtils;
+import java.util.List;
 
 public class MainActivity extends BaseActivity {
-	private final String TAG = "MainActivity";
+	private static final String TAG = "MainActivity";
 	private final Context mContext = this;
-	SeekBar mSeekBarFilterOpacity;
-	ToggleButton mToggleBtnFilter;
-	SharedPreferences mSharedPrefsScreenFilter;
+	private final FilterUtils mFilterUtils = new FilterUtils(mContext);
 
-	private CompoundButton.OnCheckedChangeListener mToggleBtnFilterCheckedChangeListener = new CompoundButton.OnCheckedChangeListener(){
+	// Views
+	private SeekBar mSeekBarFilterOpacity;
+	private ToggleButton mToggleFilter;
+	private SharedPreferences mFilterPrefs;
+
+	// Listeners
+	/**
+	 * Called when user clicks on #mToggleFilter ToggleButton for turning on/off the
+	 * filter.
+	 **/
+	private final CompoundButton.OnCheckedChangeListener mToggleFilterCheckedChangeListener =
+	new CompoundButton.OnCheckedChangeListener() {
 		@Override
 		public void onCheckedChanged(CompoundButton btn, boolean checked) {
 			if (checked)
-				mToggleBtnFilter.setChecked(startFilter());
+				btn.setChecked(startFilter());
 			else
-				mToggleBtnFilter.setChecked(!stopFilter());
+				btn.setChecked(!stopFilter());
 		}
 	};
-	private SharedPreferences.OnSharedPreferenceChangeListener mSharedScreenFilterPrefsChangeListener =
-	new SharedPreferences.OnSharedPreferenceChangeListener(){
+    
+	/**
+	 * Called when preferences of filter are changed.
+	 */
+	private final SharedPreferences.OnSharedPreferenceChangeListener mFilterPrefsChangeListener =
+	new SharedPreferences.OnSharedPreferenceChangeListener() {
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key) {
-			if (key.equals(ScreenFilterService.KEY_SERVICE_RUNNING)) {
-				mToggleBtnFilter.setOnCheckedChangeListener(null);
-				mToggleBtnFilter.setChecked(isScreenFilterServiceRunning());
-				mToggleBtnFilter.setOnCheckedChangeListener(mToggleBtnFilterCheckedChangeListener);
-			} else if (key.equals(ScreenFilterService.KEY_COLOR_OPACITY))
-				mSeekBarFilterOpacity.setProgress(sharedPrefs.getInt(ScreenFilterService.KEY_COLOR_OPACITY, 
-						mSeekBarFilterOpacity.getProgress()));
+			if (key.equals(AppConstants.KEY_COLOR_OPACITY)) {
+				// Opacity of filter has been changed
+				int filterOpacity = mFilterUtils.getFilterOpacity();
+				if (filterOpacity != mSeekBarFilterOpacity.getProgress())
+					mSeekBarFilterOpacity.setProgress(filterOpacity);
+			}
 		}
 	};
 
@@ -66,107 +70,44 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		final TextView tvFilterOpacityPercent = findViewById(R.id.filter_opacity_percent);
-		mSharedPrefsScreenFilter = getSharedPreferences(ScreenFilterService.KEY_SHARED_PREF_SCREEN_FILTER, MODE_PRIVATE);
-		mToggleBtnFilter = findViewById(R.id.toggle_filter);
+		// Initialize Views.
+		final TextView tvFilterOpacity = findViewById(R.id.filter_opacity_percent);
 		mSeekBarFilterOpacity = findViewById(R.id.filter_opacity);
-		mSeekBarFilterOpacity.setMax(225);
-		mSeekBarFilterOpacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+		mToggleFilter = findViewById(R.id.toggle_filter);
+		mFilterPrefs = 
+			getSharedPreferences(AppConstants.SHARED_PREFS_FILTER, MODE_PRIVATE);
+
+		// Setup Views
+		mSeekBarFilterOpacity.setMax(FilterUtils.MAX_OPACITY);
+		mSeekBarFilterOpacity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+				@Override
+				public void onStartTrackingTouch(SeekBar seekBar) {}
+				@Override
+				public void onStopTrackingTouch(SeekBar seekBar) {}
+
 				@Override
 				public void onProgressChanged(SeekBar seekBar, int prog, boolean throughTouch) {
-					if (prog >= 30) {
-						tvFilterOpacityPercent.setText(prog + "%");
-						mSharedPrefsScreenFilter.edit()
-							.putInt(ScreenFilterService.KEY_COLOR_OPACITY, prog)
-							.commit();
-					} else
-						seekBar.setProgress(30);
-				}
-
-				@Override
-				public void onStartTrackingTouch(SeekBar seekBar) {
-				}
-
-				@Override
-				public void onStopTrackingTouch(SeekBar seekBar) {
-				}
-			});
-		mSeekBarFilterOpacity.setProgress(mSharedPrefsScreenFilter
-			.getInt(ScreenFilterService.KEY_COLOR_OPACITY, 80));
-		
-		// FIXME: Don't start filter here instead know how to know that is filter
-		// service runnung or not
-		startFilter(true);
-		mToggleBtnFilter.setChecked(isScreenFilterServiceRunning());
-	 	mToggleBtnFilter.setOnCheckedChangeListener(mToggleBtnFilterCheckedChangeListener);
-		mSharedPrefsScreenFilter
-			.registerOnSharedPreferenceChangeListener(mSharedScreenFilterPrefsChangeListener);
-    }
-	
-	private boolean startFilter() {
-		return startFilter(false);
-	}
-	
-	private boolean startFilter(boolean forcebly) {
-		if (forcebly || (!isScreenFilterServiceRunning())) {
-			if (hasScreenFilterPermission()) {
-				startService(new Intent(MainActivity.this, ScreenFilterService.class));
-				return true;
-			} else {
-				grantPermission();
-				return false;
-			}
-		}
-		return false;
-	}
-
-	private void grantPermission() {
-		new AlertDialog.Builder(mContext)
-			.setTitle(R.string.permission_request)
-			.setMessage(R.string.permission_request_desc)
-			.setPositiveButton(R.string.go_to_settings, new DialogInterface.OnClickListener(){
-				@Override
-				public void onClick(DialogInterface dialog, int whichButton) {
-					try {
-						Intent overlayPermissionActivity =	new Intent(
-							Settings.ACTION_MANAGE_OVERLAY_PERMISSION, 
-							Uri.parse("package:" + getPackageName()));
-						startActivity(overlayPermissionActivity);
-					} catch (Exception e) {
-						StringBuilder logMessage = new StringBuilder();
-						logMessage.append("grantPermission():");
-						logMessage
-							.append(" Exception occurred while starting overlay permission activity.");
-						logMessage.append(" Getting permission in simple way!");
-						Log.e(TAG, logMessage.toString(), e);
-						startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION));
-						showToast(R.string.grant_permission_instruction, false);
-						showToast(R.string.grant_permission_instruction);
+					if (prog >= FilterUtils.MIN_OPACITY) {
+						tvFilterOpacity.setText(prog + getString(R.string.filter_opacity_percent));
+						mFilterUtils.updateFilterOpacity(prog);
+					} else {
+						seekBar.setProgress(FilterUtils.MIN_OPACITY);
 					}
 				}
-			})
-			.setNegativeButton(android.R.string.cancel, null)
-			.show();
-	}
-
-	private boolean stopFilter() {
-		if (isScreenFilterServiceRunning())
-			stopService(new Intent(MainActivity.this, ScreenFilterService.class));
-		mSharedPrefsScreenFilter.edit()
-			.putBoolean(ScreenFilterService.KEY_SERVICE_RUNNING, false)
-			.commit();
-		return true;
-	}
-
-	public boolean isScreenFilterServiceRunning() {
-		return mSharedPrefsScreenFilter
-			.getBoolean(ScreenFilterService.KEY_SERVICE_RUNNING, false);
-	}
+			});
+		mSeekBarFilterOpacity.setProgress(mFilterUtils.getFilterOpacity());
+		mToggleFilter.setTextOn(getString(R.string.stop_filter));
+		mToggleFilter.setTextOff(getString(R.string.start_filter));
+		mToggleFilter.setChecked(isFilterServiceRunning());
+	 	mToggleFilter.setOnCheckedChangeListener(mToggleFilterCheckedChangeListener);
+		mFilterPrefs
+			.registerOnSharedPreferenceChangeListener(mFilterPrefsChangeListener);
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main_menu, menu);
-		return super.onCreateOptionsMenu(menu);
+		return true;
 	}
 
 	@Override
@@ -187,21 +128,101 @@ public class MainActivity extends BaseActivity {
 
 	@Override
 	protected void onDestroy() {
-		mSharedPrefsScreenFilter
-			.unregisterOnSharedPreferenceChangeListener(mSharedScreenFilterPrefsChangeListener);
+		mFilterPrefs
+			.unregisterOnSharedPreferenceChangeListener(mFilterPrefsChangeListener);
 		super.onDestroy();
 	}
 
-	private boolean hasScreenFilterPermission() {
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT_WATCH) {
-			Log.e(TAG, "hasScreenFilterPermission(): Android version '< Kitkat', so no need for checking overly permission!");
-			return true;
-		} else if (Settings.canDrawOverlays(this)) {
-			Log.e(TAG, "Overly Permission Allowed!");
-			return true;
+	/**
+	 * Starts filter Service if not running.
+	 *
+	 * @return true if filter Service started.
+	 **/
+	private boolean startFilter() {
+		if (hasOverlayPermission()) {
+			if (!isFilterServiceRunning()) {
+				startService(new Intent(MainActivity.this, ScreenFilterService.class));
+				return true;
+			} 
 		} else {
-			Log.e(TAG, "Overly Permission Denied!");
+			grantPermission();
 			return false;
 		}
+		return false;
+	}
+
+	/**
+	 * Stops filter Service if running.
+	 *
+	 * @return true if filter Service stoped.
+	 **/
+	private boolean stopFilter() {
+		if (isFilterServiceRunning()) {
+			stopService(new Intent(MainActivity.this, ScreenFilterService.class));
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Checks whether the app has overlay permission or not.
+	 *
+	 * @return true if has permission.
+	 **/
+	private boolean hasOverlayPermission() {
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT_WATCH) {
+			Log.i(TAG, "hasScreenFilterPermission(): Android version '< Kitkat', so no need for checking overly permission!");
+			return true;
+		} else if (Settings.canDrawOverlays(this)) {
+			Log.i(TAG, "Overly Permission Allowed!");
+			return true;
+		} else {
+			Log.i(TAG, "Overly Permission Denied!");
+			return false;
+		}
+	}
+
+	/**
+	 * Shows a user dialog which navigates him to settings for granting overlay
+	 * permission.
+	 **/
+	private void grantPermission() {
+		if (hasOverlayPermission())
+			return;
+		Log.i(TAG, "Requesting for permission...");
+		new AlertDialog.Builder(mContext)
+			.setTitle(R.string.permission_request)
+			.setMessage(R.string.permission_request_desc)
+			.setPositiveButton(R.string.go_to_settings, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int whichButton) {
+					Intent overlayPermissionActivity =	new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, 
+						Uri.parse(AppConstants.SCHEME_PACKAGE + getPackageName()));
+					startActivity(overlayPermissionActivity);
+				}
+			})
+			.setNegativeButton(android.R.string.cancel, null)
+			.show();
+	}
+
+	/**
+	 * Checks whether the filter Service is running or not. It get all available Services
+	 * that are currently running on device. Then it finds filter Serrvice and checks if
+	 * it is running.
+	 **/
+	private boolean isFilterServiceRunning() {
+		ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		List<ActivityManager.RunningServiceInfo> runningServices = activityManager.getRunningServices(999999999);
+		int size = runningServices.size();
+		for (int i = 0; i < size; i++) {
+			ActivityManager.RunningServiceInfo runningService = runningServices.get(i);
+			if (runningService.service.getPackageName().equals(getPackageName())) {
+				// It is from this application.
+				if (runningService.service.getClassName().equals(ScreenFilterService.class.getName()))
+				// It is screen filter service.
+					return runningService.started;
+			}
+		}
+		return false;
 	}
 }

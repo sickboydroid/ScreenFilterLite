@@ -5,11 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -20,7 +15,7 @@ import java.io.InputStream;
  */
 
 public class BaseActivity extends Activity {
-    public final String TAG = "BaseActivity";
+    private final String TAG = "BaseActivity";
     private final Context mContext = this;
 
     /**
@@ -146,85 +141,5 @@ public class BaseActivity extends Activity {
         inputStreamOutput.close();
         inputStreamError.close();
         return output;
-    }
-
-    /**
-     * Reads file.
-     *
-     * <p>Note: If you want to read text file then use {@link #readTextFile(String)}
-     * because that reads text files using {@link java.io.BufferedReader} which uses
-     * the buffering for reading text files and saves some time and also computing
-     * power.</p>
-     *
-     * @param pathName Path of file from which you want to read data.
-     *
-     * @return Data that given file contains.
-     *
-     * @throws java.io.IOException
-     */
-    public String read(String pathName) throws IOException {
-        InputStream fileReader = new FileInputStream(pathName);
-        String readedFile = "";
-        int readedCharacter;
-        while ((readedCharacter = fileReader.read()) != -1)
-            readedFile += (char) readedCharacter;
-        fileReader.close();
-        return readedFile;
-    }
-
-    /**
-     * Reads text file.
-     *
-     * @param pathName Path of text file from which you want to read text.
-     *
-     * @return Text that given file contains.
-     *
-     * @throws java.io.IOException
-     */
-    public String readTextFile(String pathName) throws IOException {
-        BufferedReader fileReader = new BufferedReader(new FileReader(pathName));
-        String readedFile = "";
-        String readedLine;
-        while ((readedLine = fileReader.readLine()) != null)
-            readedFile += readedLine;
-        fileReader.close();
-        return readedFile;
-    }
-
-    /**
-     * @param pathName Path of file on which you want to perform writing.
-     * @param str Data that you want to write in a file.
-     *
-     * @throws java.io.FileNotFoundException In case give file is not found
-     *
-     * @see #write(String, String, boolean)
-     */
-    public void write(String pathName, String str) throws IOException {
-		write(pathName, str, false);
-    }
-
-    /**
-     * Writes file.
-     * 
-     * @param pathName Path of file on which you want to perform writing.
-     * @param str Data that you want to write in a file.
-     * @param append Append file data or not.
-     *
-     * @throws java.io.FileNotFoundException In case give file is not found
-     */
-    public void write(String pathName, String data, boolean append) 
-    throws FileNotFoundException, IOException {
-        FileOutputStream fileWriter = new FileOutputStream(pathName, append);
-        fileWriter.write(data.getBytes());
-        fileWriter.close();
-    }
-
-    /**
-     *
-     * TODO: Delete all the methods below, on the release of app.
-     *
-     */
-    protected void showToast(Object msg) {
-        Toast.makeText(mContext, msg.toString(), Toast.LENGTH_LONG).show();
     }
 }

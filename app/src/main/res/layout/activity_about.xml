@@ -39,24 +39,24 @@
 				android:layout_height="wrap_content"
 				android:layout_width="match_parent"
 				android:gravity="center_horizontal"
-				android:padding="10dp"
+				android:padding="@dimen/app_desc_padding"
 				android:text="@string/screen_filter_app_desc"
 				android:textAppearance="?android:attr/textAppearanceMedium"
 				android:textColor="@android:color/white"/>
 			<TextView
 				android:layout_height="wrap_content"
 				android:layout_width="match_parent"
-				android:layout_marginLeft="15dp"
-				android:layout_marginRight="15dp"
+				android:layout_marginLeft="@dimen/disclaimer_margin_left"
+				android:layout_marginRight="@dimen/disclaimer_margin_right"
 				android:gravity="center_horizontal"
-				android:paddingTop="10dp"
-				android:paddingBottom="10dp"
+				android:paddingTop="@dimen/disclaimer_padding_top"
+				android:paddingBottom="@dimen/disclaimer_padding_bottom"
 				android:text="@string/disclaimer"
 				android:textAppearance="?android:attr/textAppearanceSmall"/>
 			<TextView
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
-				android:text="@string/developer"
+				android:text="@string/developed_by"
 				android:textAppearance="?android:attr/textAppearanceMedium"/>
 		</LinearLayout>
 	</ScrollView>

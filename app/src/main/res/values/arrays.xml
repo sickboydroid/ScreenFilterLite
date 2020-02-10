@@ -2,25 +2,16 @@
 <resources>
 	<string-array name="pref_filter_color_entries">
 		<item>Orange (default)</item>
-		<item>Gray</item>
 		<item>Black</item>
-		<item>White</item>
-		<item>Brown</item>
 		<item>Red</item>
-		<item>Green</item>
-		<item>Blue</item>
 	</string-array>
 	<!--	
-	   * If you change here something, change that in Screen Filter Service also
+       If you change here something, change that in Screen Filter Service and
+       app constants also
 	-->
 	<string-array name="pref_filter_color_entry_values">
-		<item>default</item>
-		<item>Gray</item>
-		<item>Black</item>
-		<item>White</item>
-		<item>Brown</item>
-		<item>Red</item>
-		<item>Green</item>
-		<item>Blue</item>
+		<item>filter_color_default</item>
+		<item>filter_color_black</item>
+		<item>filter_color_red</item>
 	</string-array>
 </resources>

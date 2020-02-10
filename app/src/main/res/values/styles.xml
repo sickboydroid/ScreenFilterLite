@@ -4,6 +4,7 @@
     <style name="BaseTheme" parent="@android:style/Theme.Holo">
         <item name="android:actionBarStyle">@style/BaseTheme.ActionBarStyle</item>
 		<item name="android:typeface">sans</item>
+		<item name="android:fontFamily">sans-serif-medium</item>
 	</style>
 
     <!-- Style ActionBar -->

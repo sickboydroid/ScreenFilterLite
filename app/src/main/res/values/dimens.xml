@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<dimen name="_5dp">5dp</dimen>
+	<dimen name="app_desc_padding">5dp</dimen>
+	<dimen name="disclaimer_margin_left">10dp</dimen>
+	<dimen name="disclaimer_margin_right">10dp</dimen>
+	<dimen name="disclaimer_padding_top">5dp</dimen>
+	<dimen name="disclaimer_padding_bottom">5dp</dimen>
 </resources>
