@@ -8,9 +8,9 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.widget.Toast;
 import com.gameofcoding.screenfilter.R;
-import com.gameofcoding.screenfilter.Utils.AppConstants;
-import com.gameofcoding.screenfilter.Utils.LogCatUtils;
-import com.gameofcoding.screenfilter.Utils.Utils;
+import com.gameofcoding.screenfilter.utils.AppConstants;
+import com.gameofcoding.screenfilter.utils.LogCatUtils;
+import com.gameofcoding.screenfilter.utils.Utils;
 import java.util.PriorityQueue;
 
 public class AppPreferenceActivity extends PreferenceActivity {

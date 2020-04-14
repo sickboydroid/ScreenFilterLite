@@ -6,7 +6,7 @@ import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
-import com.gameofcoding.screenfilter.Utils.Utils;
+import com.gameofcoding.screenfilter.utils.Utils;
 
 public class ScreenManager {
 	public static final int DEFAULT_NAV_BAR_HEIGHT_DP = 48;

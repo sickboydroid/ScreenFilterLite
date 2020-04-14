@@ -3,8 +3,8 @@ package com.gameofcoding.screenfilter.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import com.gameofcoding.screenfilter.Activities.MainActivity;
-import com.gameofcoding.screenfilter.Utils.AppConstants;
+import com.gameofcoding.screenfilter.activities.MainActivity;
+import com.gameofcoding.screenfilter.utils.AppConstants;
 
 public class FilterUtils {
 	private static final String TAG = "FilterUtils";
