@@ -1,5 +1,6 @@
 package com.gameofcoding.screenfilter.activities;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -22,11 +23,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import com.gameofcoding.screenfilter.ModifiedClasses.BaseActivity;
 import com.gameofcoding.screenfilter.R;
-import com.gameofcoding.screenfilter.Services.ScreenFilterService;
-import com.gameofcoding.screenfilter.Utils.AppConstants;
-import com.gameofcoding.screenfilter.Utils.FilterUtils;
+import com.gameofcoding.screenfilter.services.ScreenFilterService;
+import com.gameofcoding.screenfilter.utils.AppConstants;
+import com.gameofcoding.screenfilter.utils.FilterUtils;
 import com.google.android.gms.ads.MobileAds;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +34,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends Activity {
 	private static final String TAG = "MainActivity";
 	private final Context mContext = this;
 	private final FilterUtils mFilterUtils = new FilterUtils(mContext);

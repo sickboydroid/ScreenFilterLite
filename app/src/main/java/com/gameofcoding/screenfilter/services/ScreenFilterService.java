@@ -31,10 +31,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.gameofcoding.screenfilter.R;
-import com.gameofcoding.screenfilter.Utils.AppConstants;
-import com.gameofcoding.screenfilter.Utils.FilterUtils;
-import com.gameofcoding.screenfilter.Utils.ScreenManager;
-import com.gameofcoding.screenfilter.Activities.FilterDialogActivity;
+import com.gameofcoding.screenfilter.utils.AppConstants;
+import com.gameofcoding.screenfilter.utils.FilterUtils;
+import com.gameofcoding.screenfilter.utils.ScreenManager;
+import com.gameofcoding.screenfilter.activities.FilterDialogActivity;
 
 public class ScreenFilterService extends Service {
 	private static final String TAG = "ScreenFilterService";
