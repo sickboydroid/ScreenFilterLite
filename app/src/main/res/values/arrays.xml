@@ -2,16 +2,21 @@
 <resources>
 	<string-array name="pref_filter_color_entries">
 		<item>Orange (default)</item>
-		<item>Black</item>
 		<item>Red</item>
 	</string-array>
 	<!--	
-       If you change here something, change that in Screen Filter Service and
-       app constants also
+	If you change here something, change that in ScreenFilterService and
+	app constants also
 	-->
 	<string-array name="pref_filter_color_entry_values">
 		<item>filter_color_default</item>
-		<item>filter_color_black</item>
 		<item>filter_color_red</item>
+	</string-array>
+	<string-array name="filter_modes">
+		<item>Custom</item>
+		<item>Night Mode (Default)</item>
+		<item>Day Mode</item>
+`		<item>Reading Mode</item>
+		<item>Gaming Mode</item>
 	</string-array>
 </resources>

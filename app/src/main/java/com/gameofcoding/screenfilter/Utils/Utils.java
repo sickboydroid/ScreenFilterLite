@@ -1,6 +1,7 @@
 package com.gameofcoding.screenfilter.Utils;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
@@ -9,15 +10,11 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
-import android.content.pm.PackageInfo;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.sql.Time;
 
 public class Utils {
 	private static final String TAG = "Utils";
@@ -224,6 +221,10 @@ public class Utils {
 		return pixels * mContext.getResources().getDisplayMetrics().density;
 	}
 
+    public int toPx(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+											  dp, mContext.getResources().getDisplayMetrics());
+    }
     /**
      * Runs linux commands using android's built in shell.
      *

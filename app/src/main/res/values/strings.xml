@@ -8,16 +8,18 @@
         grant permissions or install apps. Turn <i>OFF</i> the filter before you grant any permissions or
 		install apps. The developers are not responsible for any damages or loss caused with
 		the usage of this app.</string>
-	<string name="filter_opacity">Filter opacity</string>
+	<string name="filter_color">Filter Color</string>
+	<string name="filter_darkness">Filter Darkness</string>
 	<string name="filter_warning_desc"><b>Note:</b> Please note that when filter is <i>ON</i> you cannot
         grant permissions or install apps. Turn <i>OFF</i> the filter before you grant any permissions or
 		install apps.</string>
-    <string name="filter_opacity_percent">%</string>
     <string name="on">ON</string>
 	<string name="off">OFF</string>
 	<string name="start_filter">Start filter</string>
 	<string name="stop_filter">Stop filter</string>
-	<string name="filter_color">Screen Filter Color</string>
+	<string name="resume_filter">Resume filter</string>
+	<string name="pause_filter">Pause  filter</string>
+	<string name="screen_filter_color">Screen Filter Color</string>
 	<string name="can_not_create_window_error">Can\'t create Window!</string>
 	<string name="settings">Settings</string>
 	<string name="about">About</string>
@@ -52,4 +54,11 @@
 	<string name="permission_request_desc">This app needs \"<b>Draw Over Other Apps</b>\"
 		permission in order to work. Please grant permission in settings.</string>
 	<string name="go_to_settings">Go to Settings</string>
+	<string name="notification_channel_filter_description">The persistent overlay control notification</string>
+	<string name="notification_channel_filter_name">Filter Config.</string>
+	<string name="toggle_filter">Toggle Filter</string>
+	<string name="open_app">Open App</string>
+	<string name="mainActivityBannerAdID">ca-app-pub-3940256099942544/6300978111</string>
+	<string name="filterDialogBannerAdID">ca-app-pub-3940256099942544/6300978111</string>
+	
 </resources>

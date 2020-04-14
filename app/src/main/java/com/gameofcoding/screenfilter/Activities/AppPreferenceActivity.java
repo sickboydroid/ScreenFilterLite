@@ -35,6 +35,8 @@ public class AppPreferenceActivity extends PreferenceActivity {
 			.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener(){
 				@Override
 				public boolean onPreferenceClick(Preference prefs) {
+					LogCatUtils log = new LogCatUtils(getExternalCacheDir());
+					log.writeLogCat();
 					Intent intentSendFeedback = new Intent(Intent.ACTION_SENDTO,
 						Uri.fromParts("mailto", getString(R.string.developer_email_id), null));
 					intentSendFeedback.putExtra(Intent.EXTRA_SUBJECT, "Screen Filter Lite - Feedback");

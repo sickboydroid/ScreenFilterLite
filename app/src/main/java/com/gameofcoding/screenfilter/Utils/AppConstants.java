@@ -3,18 +3,21 @@ package com.gameofcoding.screenfilter.Utils;
 public abstract class AppConstants {
 	public static final String SCHEME_PACKAGE = "package:";
 	public static final String SHARED_PREFS_FILTER = "shared_pref_filter";
-	public static final String KEY_COLOR_OPACITY = "color_opacity";
-
+	public static final String KEY_FILTER_SERVICE_RUNNING = "filter_service_running";
+	public static final String KEY_FILTER_COLOR = "filter_color";
+	public static final String KEY_FILTER_DARKNESS = "filter_darkness";
+	public static final String KEY_FILTER_CUSTOM_COLOR = "filter_custom_color";
+	public static final String KEY_FILTER_CUSTOM_DARKNESS = "filter_custom_darkness";
+	public static final String KEY_FILTER_MODE = "filter_mode";
+	public static final String EXTRA_IS_FILTER_ON = "is_filter_on";
+	
     // Intent actions...
 	public static final String ACTION_FILTER_TOGGLED = "filter_toggled";
-	public static final String ACTION_FILTER_OPACITY_INCREASE  = "filter_opacity_increase";
-	public static final String ACTION_FILTER_OPACITY_DECREASE = "filter_opacity_decrease";
 
 	public static abstract class PreferenceConstants {
 		public static final String KEY_FILTER_STATUS_BAR = "filter_status_bar";
 		public static final String KEY_FILTER_COLOR = "filter_color";
         public static final String KEY_FC_DEF = "filter_color_default";
-        public static final String KEY_FC_BLACK = "filter_color_black";
         public static final String KEY_FC_RED = "filter_color_red";
 		public static final String KEY_SEND_FEEDBACK = "send_feedback";
 		public static final String KEY_ABOUT = "about_app";
