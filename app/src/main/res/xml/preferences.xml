@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<!--<PreferenceCategory
+		android:title="@string/app_settings">
+	</PreferenceCategory>-->
+
+	<PreferenceCategory
+		android:title="@string/filter_settings">
+		<CheckBoxPreference
+			android:key="filter_status_bar"
+			android:title="@string/filter_status_bar"
+			android:defaultValue="true"
+			android:summary="@string/summary_filter_status_bar"/>
+		<ListPreference
+			android:key="filter_color"
+			android:title="@string/screen_filter_color"
+            android:summary="@string/summary_filter_color"
+			android:dialogTitle="@string/screen_filter_color"
+			android:defaultValue="filter_color_default"
+			android:entries="@array/pref_filter_color_entries"
+			android:entryValues="@array/pref_filter_color_entry_values"/>
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="@string/help_and_support">
+		<PreferenceScreen
+			android:title="@string/help"
+			android:summary="@string/summary_help">
+         <!--FIXME: Set Url of help page that would be available on github-->
+			<intent android:action="android.intent.action.VIEW"
+				android:data="http://www.github.com" />
+        </PreferenceScreen>
+		<Preference
+			
+			android:title="@string/rate_and_review"
+			android:summary="@string/summary_rate_and_review">
+			<intent android:action="android.intent.action.VIEW" 
+				android:data="market://details?id=com.gameofcoding.screenfilter"/>
+		</Preference>
+		<Preference
+			android:key="send_feedback"
+			android:title="@string/feedback"
+			android:summary="@string/summary_feedback">
+        </Preference>
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="@string/about">
+		<Preference
+			android:title="@string/about"
+			android:summary="@string/summary_about"
+			android:key="about_app">
+        </Preference>
+	</PreferenceCategory>
+	
+	<PreferenceCategory
+		android:title="@string/reset">
+		<Preference
+			android:title="@string/reset_settings"
+			android:summary="@string/summary_reset_settings"
+			android:key="reset_prefs">
+        </Preference>
+	</PreferenceCategory>
+</PreferenceScreen>

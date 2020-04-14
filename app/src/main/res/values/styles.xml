@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Default theme of app. -->
-    <style name="BaseTheme" parent="@android:style/Theme.Material">
-        <item name="android:colorPrimary">@color/primaryColor</item>
-        <item name="android:colorAccent">@color/accentColor</item>
-        <item name="android:statusBarColor">@color/primaryDarkColor</item>
-	<item name="android:typeface">sans</item>
+	<!-- Default theme of app. -->
+    <style name="BaseTheme" parent="@android:style/Theme.Holo">
+        <item name="android:actionBarStyle">@style/BaseTheme.ActionBarStyle</item>
+		<item name="android:typeface">sans</item>
+		<item name="android:fontFamily">sans-serif-medium</item>
+	</style>
+
+    <!-- Style ActionBar -->
+    <style name="BaseTheme.ActionBarStyle" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@color/primaryColor</item>
     </style>
 
-    <!-- Use this Style to change an Activity to Dialog. -->
-    <style name="BaseTheme.DialogActivity" parent="@android:style/Theme.Material.Dialog">
+	<!-- Use this Style to change an Activity to Dialog. -->
+    <style name="BaseTheme.DialogActivity" parent="@android:style/Theme.Holo.Dialog">
     </style>
 
-    <!-- Use this Style if you want to hide ActionBar and app label -->
+	<!-- Use this Style if you want to hide ActionBar and app label -->
     <style name="BaseTheme.NoActionBar" parent="BaseTheme">
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
