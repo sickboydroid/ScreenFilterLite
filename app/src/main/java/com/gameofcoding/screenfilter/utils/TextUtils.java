@@ -1,4 +1,4 @@
-package com.gameofcoding.screenfilter.Utils;
+package com.gameofcoding.screenfilter.utils;
 
 public class TextUtils {
 	public static boolean isEmpty(String cs) {

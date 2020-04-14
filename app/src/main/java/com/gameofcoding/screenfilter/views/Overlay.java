@@ -1,4 +1,4 @@
-package com.gameofcoding.screenfilter.Views;
+package com.gameofcoding.screenfilter.views;
 
 import android.content.*;
 import android.view.*;

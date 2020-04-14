@@ -1,4 +1,4 @@
-package com.gameofcoding.screenfilter.Services;
+package com.gameofcoding.screenfilter.services;
 
 import android.app.AlertDialog;
 import android.app.Notification;

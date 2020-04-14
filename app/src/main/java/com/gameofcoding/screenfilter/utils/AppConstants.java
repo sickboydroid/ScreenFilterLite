@@ -1,4 +1,4 @@
-package com.gameofcoding.screenfilter.Utils;
+package com.gameofcoding.screenfilter.utils;
 
 public abstract class AppConstants {
 	public static final String SCHEME_PACKAGE = "package:";

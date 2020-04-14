@@ -1,6 +1,5 @@
-package com.gameofcoding.screenfilter.Activities;
+package com.gameofcoding.screenfilter.activities;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -12,35 +11,42 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
+import com.gameofcoding.screenfilter.ModifiedClasses.BaseActivity;
 import com.gameofcoding.screenfilter.R;
 import com.gameofcoding.screenfilter.Services.ScreenFilterService;
 import com.gameofcoding.screenfilter.Utils.AppConstants;
 import com.gameofcoding.screenfilter.Utils.FilterUtils;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import java.util.Arrays;
 import java.util.List;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 
-public class FilterDialogActivity extends Activity {
-	private static final String TAG = "FilterDialogActivity";
+public class MainActivity extends BaseActivity {
+	private static final String TAG = "MainActivity";
 	private final Context mContext = this;
-	FilterUtils mFilterUtils = new FilterUtils(mContext);
-
+	private final FilterUtils mFilterUtils = new FilterUtils(mContext);
 
 	// Views
+	Spinner mSpinnerFilterModes;
 	private SeekBar mSeekBarFilterColor;
 	private SeekBar mSeekBarFilterDarkness;
-	private Switch mToggleFilter;
-	private AdView mAdView;
+	private ToggleButton mToggleFilter;
 	private SharedPreferences mFilterPrefs;
+	private AdView mAdView;
+	private InterstitialAd mInterstitialAd;
 
 	// Listeners
 	/**
@@ -51,13 +57,13 @@ public class FilterDialogActivity extends Activity {
 	new CompoundButton.OnCheckedChangeListener() {
 		@Override
 		public void onCheckedChanged(CompoundButton btn, boolean checked) {
-			mFilterUtils.setIsFilterOn(checked);
 			if (checked)
 				btn.setChecked(startFilter());
 			else
 				btn.setChecked(!stopFilter());
 		}
 	};
+
 	/**
 	 * Called when preferences of filter are changed.
 	 */
@@ -65,7 +71,12 @@ public class FilterDialogActivity extends Activity {
 	new SharedPreferences.OnSharedPreferenceChangeListener() {
 		@Override
 		public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key) {
-			if (key.equals(AppConstants.KEY_FILTER_COLOR)) {
+			if (key.equals(AppConstants.KEY_FILTER_SERVICE_RUNNING)) {
+				// Filter service toggled (May be from dialog)
+				mToggleFilter.setOnCheckedChangeListener(null);
+				mToggleFilter.setChecked(mFilterUtils.isFilterOn());
+				mToggleFilter.setOnCheckedChangeListener(mToggleFilterCheckedChangeListener);
+			} else if (key.equals(AppConstants.KEY_FILTER_COLOR)) {
 				// Color of filter has been changed
 				int filterColor = mFilterUtils.getFilterColor();
 				if (filterColor != mSeekBarFilterColor.getProgress())
@@ -75,28 +86,41 @@ public class FilterDialogActivity extends Activity {
 				int filterDarkness = mFilterUtils.getFilterDarkness();
 				if (filterDarkness != mSeekBarFilterDarkness.getProgress())
 					mSeekBarFilterDarkness.setProgress(filterDarkness);
+			} else if (key.equals(AppConstants.KEY_FILTER_MODE)) {
+				// Mode of filter has been changed
+				int filterMode = mFilterUtils.getFilterMode();
+				if (filterMode != mSpinnerFilterModes.getSelectedItemPosition())
+					mSpinnerFilterModes.setSelection(mFilterUtils.getFilterMode());
 			}
 		}
 	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.dialog_filter_settings);
+		setContentView(R.layout.activity_main);
 		// Initialize Views.
-		final Spinner spinnerFilterModes = findViewById(R.id.spinner_filter_modes);
+		mSpinnerFilterModes = findViewById(R.id.spinner_filter_modes);
 		final TextView tvFilterColor = findViewById(R.id.filter_color_percent);
 		final TextView tvFilterDarkness = findViewById(R.id.filter_darkness_percent);
 		mSeekBarFilterColor = findViewById(R.id.filter_color);
 		mSeekBarFilterDarkness = findViewById(R.id.filter_darkness);
+		mToggleFilter = findViewById(R.id.toggle_filter);
+		
+		// Setup ads
+		MobileAds.initialize(this, "ca-app-pub-9943487589376556~7982987830");
 		mAdView = findViewById(R.id.adView);
+		mInterstitialAd = new InterstitialAd(mContext);
+		//mInterstitialAd.setAdUnitId("ca-app-pub-9943487589376556/6930648662");
+		mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
 		AdRequest adRequest = new AdRequest.Builder().build();
 		mAdView.loadAd(adRequest);
-		mToggleFilter = findViewById(R.id.toggle_filter);
+		mInterstitialAd.loadAd(adRequest);
 		mFilterPrefs =
 			getSharedPreferences(AppConstants.SHARED_PREFS_FILTER, MODE_PRIVATE);
 
 		// Setup Views
-		spinnerFilterModes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+		mSpinnerFilterModes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 				@Override
 				public void onItemSelected(AdapterView<?> adapView, View view, int position, long id) {
 					Toast.makeText(mContext, getResources().getStringArray(R.array.filter_modes)[position], Toast.LENGTH_SHORT).show();
@@ -107,10 +131,11 @@ public class FilterDialogActivity extends Activity {
 				public void onNothingSelected(AdapterView<?> adapView) {
 				}
 			});  
+
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.filter_modes));  
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);  
-        spinnerFilterModes.setAdapter(arrayAdapter);  
-		spinnerFilterModes.setSelection(mFilterUtils.getFilterMode());
+        mSpinnerFilterModes.setAdapter(arrayAdapter);  
+		mSpinnerFilterModes.setSelection(mFilterUtils.getFilterMode());
 		mSeekBarFilterColor.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 				@Override
 				public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -122,7 +147,7 @@ public class FilterDialogActivity extends Activity {
 					if (fromUser && mFilterUtils.getFilterMode() != FilterUtils.MODE_CUSTOM) {
 						mFilterPrefs.unregisterOnSharedPreferenceChangeListener(mFilterPrefsChangeListener);
 						mFilterUtils.setFilterMode(FilterUtils.MODE_CUSTOM);
-						spinnerFilterModes.setSelection(FilterUtils.MODE_CUSTOM);
+						mSpinnerFilterModes.setSelection(FilterUtils.MODE_CUSTOM);
 						tvFilterColor.setText(prog + "%");
 						mFilterUtils.updateFilterColor(prog);
 						mFilterPrefs.registerOnSharedPreferenceChangeListener(mFilterPrefsChangeListener);
@@ -143,7 +168,7 @@ public class FilterDialogActivity extends Activity {
 					if (fromUser && mFilterUtils.getFilterMode() != FilterUtils.MODE_CUSTOM) {
 						mFilterPrefs.unregisterOnSharedPreferenceChangeListener(mFilterPrefsChangeListener);
 						mFilterUtils.setFilterMode(FilterUtils.MODE_CUSTOM);
-						spinnerFilterModes.setSelection(FilterUtils.MODE_CUSTOM);
+						mSpinnerFilterModes.setSelection(FilterUtils.MODE_CUSTOM);
 						tvFilterDarkness.setText(prog + "%");
 						mFilterUtils.updateFilterDarkness(prog);
 						mFilterPrefs.registerOnSharedPreferenceChangeListener(mFilterPrefsChangeListener);
@@ -155,24 +180,47 @@ public class FilterDialogActivity extends Activity {
 			});
 		mSeekBarFilterColor.setProgress(mFilterUtils.getFilterColor());
 		mSeekBarFilterDarkness.setProgress(mFilterUtils.getFilterDarkness());
+		mToggleFilter.setTextOn(getString(R.string.stop_filter));
+		mToggleFilter.setTextOff(getString(R.string.start_filter));
 		mToggleFilter.setChecked(isFilterServiceRunning());
 		mToggleFilter.setOnCheckedChangeListener(mToggleFilterCheckedChangeListener);
 		mFilterPrefs
 			.registerOnSharedPreferenceChangeListener(mFilterPrefsChangeListener);
 	}
-	
-	public void ok(View v) {
-		finish();
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main_menu, menu);
+		return true;
 	}
-	
-	public void openApp(View v) {
-		try{
-			finish();
-		} finally {
-			startActivity(new Intent(this, MainActivity.class));
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.menu_settings:
+				if(mInterstitialAd.isLoaded())
+					mInterstitialAd.show();
+				startActivity(new Intent(MainActivity.this, AppPreferenceActivity.class));
+				return true;
+			case R.id.menu_about:
+				startActivity(new Intent(MainActivity.this, AboutActivity.class));
+				return true;
+			case R.id.menu_exit:
+				if(mInterstitialAd.isLoaded())
+					mInterstitialAd.show();
+				finish();
+				return true;
 		}
+		return false;
 	}
-	
+
+	@Override
+	protected void onDestroy() {
+		mFilterPrefs
+			.unregisterOnSharedPreferenceChangeListener(mFilterPrefsChangeListener);
+		super.onDestroy();
+	}
+
 	/**
 	 * Starts filter Service if not running.
 	 *
@@ -181,7 +229,7 @@ public class FilterDialogActivity extends Activity {
 	private boolean startFilter() {
 		if (hasOverlayPermission()) {
 			if (!isFilterServiceRunning()) {
-				startService(new Intent(FilterDialogActivity.this, ScreenFilterService.class));
+				startService(new Intent(MainActivity.this, ScreenFilterService.class));
 				return true;
 			} 
 		} else {
@@ -198,7 +246,7 @@ public class FilterDialogActivity extends Activity {
 	 **/
 	private boolean stopFilter() {
 		if (isFilterServiceRunning()) {
-			stopService(new Intent(mContext, ScreenFilterService.class));
+			stopService(new Intent(MainActivity.this, ScreenFilterService.class));
 			return true;
 		}
 		return false;

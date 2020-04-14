@@ -1,61 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-	xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.gameofcoding.screenfilter" >
-	<uses-sdk
-		android:minSdkVersion="19"
-		android:targetSdkVersion="29"/>
-	<uses-permission
-		android:name="android.permission.FOREGROUND_SERVICE" />
-	<uses-permission
-		android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-	<uses-permission
-		android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-	<uses-permission
-		android:name="android.permission.INTERNET"/>
-	<uses-permission
-		android:name="android.permission.ACCESS_NETWORK_STATE"/>
-	<application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/BaseTheme"
-		android:resizeableActivity="true">
-	    <!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-9943487589376556~7982987830"/>
-		<!--Activities-->
-        <activity
-            android:name=".Activities.MainActivity"
-            android:label="@string/app_name"
-			android:launchMode="singleInstance">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.HOME" />
-            </intent-filter>
-        </activity>
-		<activity
-			android:name=".Activities.AppPreferenceActivity"
-			android:label="@string/settings"
-			android:parentActivityName=".Activities.MainActivity">
-			<intent-filter>
-				<category android:name="android.intent.category.PREFERENCE" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".Activities.AboutActivity"
-			android:theme="@style/BaseTheme.DialogActivity"
-			android:finishOnCloseSystemDialogs="true">
-		</activity>
-		<activity
-			android:name=".Activities.FilterDialogActivity"
-			android:theme="@style/BaseTheme.DialogActivity"
-			android:finishOnCloseSystemDialogs="true">
-		</activity>
-		<!--Services-->
-		<service android:name=".Services.ScreenFilterService"
-			android:configChanges="screenSize|orientation|screenLayout|navigation"/>
-    </application>
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		package="com.gameofcoding.screenfilter"
+		android:versionCode="1"
+		android:versionName="1.0">
+    	
+		<!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
+
+		<uses-permission
+				android:name="android.permission.FOREGROUND_SERVICE" />
+		<uses-permission
+				android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+		<uses-permission
+				android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+		<uses-permission
+				android:name="android.permission.INTERNET"/>
+		<uses-permission
+				android:name="android.permission.ACCESS_NETWORK_STATE"/>
+		<application
+				android:allowBackup="true"
+				android:icon="@mipmap/ic_launcher"
+				android:label="@string/app_name"
+				android:theme="@style/BaseTheme"
+				android:resizeableActivity="true">
+		<!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
+			<meta-data
+					android:name="com.google.android.gms.ads.APPLICATION_ID"
+					android:value="ca-app-pub-9943487589376556~7982987830"/>
+			<!--Activities-->
+			<activity
+					android:name=".activities.MainActivity"
+					android:label="@string/app_name"
+					android:launchMode="singleInstance">
+					<intent-filter>
+							<action android:name="android.intent.action.MAIN" />
+							<category android:name="android.intent.category.LAUNCHER" />
+							<category android:name="android.intent.category.HOME" />
+					</intent-filter>
+			</activity>
+			<activity
+					android:name=".activities.AppPreferenceActivity"
+					android:label="@string/settings"
+					android:parentActivityName=".activities.MainActivity">
+					<intent-filter>
+							<category android:name="android.intent.category.PREFERENCE" />
+					</intent-filter>
+			</activity>
+			<activity
+					android:name=".activities.AboutActivity"
+					android:theme="@style/BaseTheme.DialogActivity"
+					android:finishOnCloseSystemDialogs="true">
+			</activity>
+			<activity
+					android:name=".activities.FilterDialogActivity"
+					android:theme="@style/BaseTheme.DialogActivity"
+					android:finishOnCloseSystemDialogs="true">
+			</activity>
+			<!--Services-->
+			<service 
+					android:name=".services.ScreenFilterService"
+					android:configChanges="screenSize|orientation|screenLayout|navigation"/>
+		</application>
 </manifest>

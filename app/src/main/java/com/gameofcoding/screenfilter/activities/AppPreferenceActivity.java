@@ -1,4 +1,4 @@
-package com.gameofcoding.screenfilter.Activities;
+package com.gameofcoding.screenfilter.activities;
 
 import android.content.Context;
 import android.content.Intent;

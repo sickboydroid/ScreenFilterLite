@@ -1,4 +1,4 @@
-package com.gameofcoding.screenfilter.Utils;
+package com.gameofcoding.screenfilter.utils;
 
 import android.util.Log;
 import java.io.File;
