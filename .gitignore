@@ -1,6 +1,0 @@
-app/build
-bin/
-gen/
-obj/
-libs/*/*.so
-
