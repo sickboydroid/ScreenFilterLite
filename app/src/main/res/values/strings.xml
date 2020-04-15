@@ -58,7 +58,7 @@
 	<string name="notification_channel_filter_name">Filter Config.</string>
 	<string name="toggle_filter">Toggle Filter</string>
 	<string name="open_app">Open App</string>
-	<string name="mainActivityBannerAdID">ca-app-pub-3940256099942544/6300978111</string>
+	<string name="mainActivityBannerAdID">ca-app-pub-9943487589376556/8410417142</string>
 	<string name="filterDialogBannerAdID">ca-app-pub-3940256099942544/6300978111</string>
 	
 </resources>
