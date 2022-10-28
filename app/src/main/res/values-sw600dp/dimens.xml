@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<dimen name="app_desc_padding">10dp</dimen>
-	<dimen name="disclaimer_margin_left">15dp</dimen>
-	<dimen name="disclaimer_margin_right">15dp</dimen>
-	<dimen name="disclaimer_padding_top">10dp</dimen>
-	<dimen name="disclaimer_padding_bottom">10dp</dimen>
-</resources>
